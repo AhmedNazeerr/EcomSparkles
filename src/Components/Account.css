@@ -1,0 +1,108 @@
+/* Account.css */
+
+.user-account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+  }
+  
+  .order-list {
+    text-align: center;
+  }
+  
+  .small-container {
+    width: 80%;
+  }
+  
+  .small-header {
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .header-text-container {
+    margin: 0 auto;
+  }
+  
+  .section-heading {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .order-count {
+    display: inline-block;
+    padding: 4px;
+    border-radius: 50%;
+    background-color: #000;
+    color: #fff;
+  }
+  
+  .subdued-text {
+    margin-bottom: 20px;
+  }
+  
+  .action-btn-wrapper {
+    margin-top: 20px;
+  }
+  
+  .primary-btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background-color 0.3s;
+  }
+  
+  .primary-btn:hover {
+    background-color: #0056b3;
+  }
+  
+
+
+/* Your CSS file */
+
+.link-bar__wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px; /* Adjust the margin-top value as needed */
+  }
+  
+  .link-bar__linklist {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 20px; /* Adjust the gap value as needed */
+  }
+  
+  .link-bar__link-item {
+    margin: 0;
+  }
+  
+  .link-bar__link {
+    color: #000;
+    text-decoration: none;
+    font-size: 16px; /* Adjust the font size as needed */
+    position: relative;
+  }
+  
+  .link-bar__link:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: -2px; /* Adjust the distance from the text */
+    left: 0;
+    width: 100%;
+    height: 2px; /* Adjust the thickness of the line */
+    background-color: #000;
+    transform: scaleX(0); /* Initial state, hidden line */
+    transform-origin: bottom right;
+    transition: transform 0.3s ease;
+  }
+  
+  .link-bar__link:hover:after {
+    transform: scaleX(1); /* Display the line on hover */
+  }
+  
