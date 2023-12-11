@@ -5,8 +5,11 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import "./ViewItem.css"; // Import your CSS file for styling
+import { useDispatch } from "react-redux";
+import { storeActions } from "../Features/slice";
 
 const ViewItem = ({ productData }) => {
+  const dispatch = useDispatch();
   const [qtyCount, setQtyCount] = useState(1);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [isTabView, setTabView] = useState(window.innerWidth <= 768);
@@ -48,6 +51,13 @@ const ViewItem = ({ productData }) => {
       var nextImage = images[currentIndex + 1];
       setSelectedImage(nextImage);
     }
+  };
+
+  const addItemToTheCart = () => {
+    console.log(productData)
+    dispatch(
+      storeActions.addItemToCart({ ...productData, quantity: qtyCount })
+    );
   };
 
   return (
@@ -182,7 +192,11 @@ const ViewItem = ({ productData }) => {
               </div>
             </div>
 
-            <button id="addtocart" style={{ borderRadius: 8 }}>
+            <button
+              id="addtocart"
+              style={{ borderRadius: 8 }}
+              onClick={addItemToTheCart}
+            >
               Add to Cart
             </button>
           </div>

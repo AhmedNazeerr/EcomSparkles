@@ -10,10 +10,12 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import SubCat from "./SubCat";
+import { useNavigate } from "react-router-dom";
 
 
 const Navbar = () => {
   const isSmallScreen = () => window.innerWidth < 950;
+  const navigate = useNavigate()
 
   const [isSticky, setIsSticky] = useState(false);
   const [smallScreen, setSmallScreen] = useState(isSmallScreen());

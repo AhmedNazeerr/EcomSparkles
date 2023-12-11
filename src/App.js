@@ -83,15 +83,13 @@ function App() {
   const dummyProduct = {
     name: "Leather Cleaner Car Cleaning Wipes for Leather, Vinyl, and Faux Leather (50 Wipes)",
     quantity: 1,
-    priceBefore: 13.99,
-    priceAfter: 9.99,
+    price: {sale: 9.99, old: 13.99},
     image: img1,
   };
   const dummyProduct2 = {
     name: "Leather Cleaner Car Cleaning Wipes for Leather, Vinyl, and Faux Leather (50 Wipes)",
     quantity: 1,
-    priceBefore: 13.99,
-    priceAfter: 9.99,
+    price: {sale: 9.99, old: 13.99},
     image: img1,
   };
 

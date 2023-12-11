@@ -12,6 +12,8 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { storeActions } from "../Features/slice";
 
 const dummyproducts = [
   {
@@ -64,14 +66,16 @@ const dummyproducts = [
   },
 ];
 
-const Cart = ({ products = [] }) => {
+const Cart = ({products}) => {
+  const dispatch = useDispatch();
+  const cartdata = useSelector(state => state.cartProduct)
   const navigate = useNavigate();
   const handleCheckoutClick = () => {
     console.log(`Clicked on Checkout`);
     navigate(`/CheckoutPage`);
   };
 
-  const [itemss, setItemss] = useState(products);
+  const [itemss, setItemss] = useState(cartdata);
 
   const isSmallScreen = () => window.innerWidth < 950;
   const [smallScreen, setSmallScreen] = useState(isSmallScreen());
@@ -110,13 +114,13 @@ const Cart = ({ products = [] }) => {
     console.log("Prev clicked");
   };
 
-  const handleIncrement = (value, index) => {
+  const handleIncrement = (_value, index) => {
     const updatedQuantityArray = [...quantityArray];
     updatedQuantityArray[index] = updatedQuantityArray[index] + 1;
     setQuantityArray(updatedQuantityArray);
 
     // Use updatedQuantityArray for all price calculations
-    const productPriceBefore = products[index].priceBefore;
+    const productPriceBefore = cartdata[index].price.old;
     const newBPrice = productPriceBefore * updatedQuantityArray[index];
     const updatedBPriceArray = [...bPriceArray];
     updatedBPriceArray[index] = parseFloat(
@@ -126,7 +130,7 @@ const Cart = ({ products = [] }) => {
     );
     setBPriceArray(updatedBPriceArray);
 
-    const productPriceAfter = products[index].priceAfter;
+    const productPriceAfter = cartdata[index].price.sale;
     const newAPrice = productPriceAfter * updatedQuantityArray[index];
     const updatedAPriceArray = [...aPriceArray];
     updatedAPriceArray[index] = parseFloat(
@@ -147,14 +151,14 @@ const Cart = ({ products = [] }) => {
     setTotal(parseFloat(calculatedTotal));
   };
 
-  const handleDecrement = (value, index) => {
+  const handleDecrement = (_value, index) => {
     if (quantityArray[index] > 1) {
       const updatedQuantityArray = [...quantityArray];
       updatedQuantityArray[index] = updatedQuantityArray[index] - 1;
       setQuantityArray(updatedQuantityArray);
 
       // Use updatedQuantityArray for all price calculations
-      const productPriceBefore = products[index].priceBefore;
+      const productPriceBefore = cartdata[index].price.old;
       const newBPrice = productPriceBefore * updatedQuantityArray[index];
       const updatedBPriceArray = [...bPriceArray];
       updatedBPriceArray[index] = parseFloat(
@@ -164,7 +168,7 @@ const Cart = ({ products = [] }) => {
       );
       setBPriceArray(updatedBPriceArray);
 
-      const productPriceAfter = products[index].priceAfter;
+      const productPriceAfter = cartdata[index].price.sale;
       const newAPrice = productPriceAfter * updatedQuantityArray[index];
       const updatedAPriceArray = [...aPriceArray];
       updatedAPriceArray[index] = parseFloat(
@@ -190,18 +194,19 @@ const Cart = ({ products = [] }) => {
 
   // Call the calculateTotal function when the component mounts and when products change
   useEffect(() => {
-    const initialQuantities = products.map((product) => product.quantity);
+    if(cartdata.length) {
+      const initialQuantities = cartdata.map((product) => product.quantity);
     setQuantityArray(initialQuantities);
 
-    const initialBPrices = products.map((product) => product.priceBefore); // Fix variable name
+    const initialBPrices = cartdata.map((product) => product.price.old); // Fix variable name
     setBPriceArray(initialBPrices);
 
-    const initialAPrices = products.map((product) => product.priceAfter); // Fix variable name
+    const initialAPrices = cartdata.map((product) => product.price.sale); // Fix variable name
     setAPriceArray(initialAPrices);
 
     let calculatedTotal = 0;
-    products.forEach((product) => {
-      const productTotal = product.priceAfter * product.quantity;
+    cartdata.forEach((product) => {
+      const productTotal = product.price.sale * product.quantity;
       calculatedTotal += productTotal;
     });
 
@@ -219,9 +224,13 @@ const Cart = ({ products = [] }) => {
 
     // Update the total state
     setTotal(parseFloat(calculatedTotal));
-  }, [products, itemss]);
+  } else {
+    setTotal(0);
+    }
+  }, [cartdata, itemss]);
 
-  const handleRemoveButton = () => {
+  const handleRemoveButton = (productCode) => {
+    dispatch(storeActions.removeItemFromCart(productCode))
     const updatedProducts = [...itemss];
     // Remove the item at the specified index
     updatedProducts.splice(0, 1);
@@ -251,7 +260,7 @@ const Cart = ({ products = [] }) => {
             <div key={index} className="cartitem">
               <div className="cart-item-img">
                 <img
-                  src={product.image}
+                  src={product.images[0]}
                   alt={product.name}
                   className="product-image"
                 />
@@ -261,16 +270,16 @@ const Cart = ({ products = [] }) => {
                 <div className="productpricequantity">
                   <div className="productprice">
                     <div className="product-price1">
-                      ${product.priceAfter} each{" "}
+                      ${product.price.sale} each{" "}
                     </div>
-                    <div className="product-price2">${product.priceBefore}</div>
+                    <div className="product-price2">${product.price.old}</div>
                   </div>
                   <div className="quantityRecord">
                     <div className="round-button">
                       <button
                         className="minusButton"
                         onClick={() =>
-                          handleDecrement(product.priceAfter, index)
+                          handleDecrement(product.price.sale, index)
                         }
                         // onClick={handleRemoveButton}
                       >
@@ -280,7 +289,7 @@ const Cart = ({ products = [] }) => {
                       <button
                         className="plusButton"
                         onClick={() =>
-                          handleIncrement(product.priceAfter, index)
+                          handleIncrement(product.price.sale, index)
                         }
                       >
                         {" "}
@@ -294,7 +303,7 @@ const Cart = ({ products = [] }) => {
                             </div> */}
                 </div>
                 <div className="editRemove">
-                  <button onClick={handleRemoveButton}>Remove</button>
+                  <button onClick={() => handleRemoveButton(product.productCode)}>Remove</button>
                 </div>
               </div>
             </div>

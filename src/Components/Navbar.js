@@ -13,9 +13,11 @@ import {useNavigate} from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
 import SubCat from "./SubCat";
 import SearchBar from "./SearchBar.js";
+import { useSelector } from "react-redux";
 
 
 const Navbar = ({shouldExecute = true}) => {
+  const itemInCart = useSelector(state => state.itemInCart)
   const isSmallScreen = () => window.innerWidth < 950;
 
   const [isSticky, setIsSticky] = useState(false);
@@ -142,14 +144,13 @@ const Navbar = ({shouldExecute = true}) => {
               </div>
             </div>
             <div className="navbar-middle">
-              <a href="/">
                 <img
+                  onClick={() => navigate("/")}
                   src={logo}
                   id="Lg"
                   alt="Your Logo"
                   className={`logo ${isSticky ? "logoS" : ""}`}
                 />
-              </a>
             </div>
             <div className="navbar-right">
               <div className="child2" id="crt">
@@ -182,8 +183,6 @@ const Navbar = ({shouldExecute = true}) => {
               icon={faChevronRight}
               style={{ fontSize: "12px", color: "#24245a", cursor: "pointer" }}
               onClick={() => handleMenuItemClick(item)}
-
-              
             />
           </li>
         ))}
@@ -214,13 +213,12 @@ const Navbar = ({shouldExecute = true}) => {
         <div id="FullNavbar" className={isSticky ? "sticky" : ""}>
           <nav className="navbar">
             <div className="navbar-left">
-              <a href="/">
                 <img
+                  onClick={() => navigate("/")}
                   src={logo}
                   alt="Your Logo"
                   className={`logo ${isSticky ? "logoS" : ""}`}
                 />
-              </a>
             </div>
             <div>
               <a href="/">
@@ -242,7 +240,8 @@ const Navbar = ({shouldExecute = true}) => {
                 </button>
               </div>
 
-              <div className="child2">
+              <div className="child2" style={{width: 'fit-content', position: 'relative'}}>
+                <div style={{backgroundColor: 'red', width: '25px', height: '25px', borderRadius: '100%', color:"white", fontWeight: 'bold', display: "flex", alignItems: "center", justifyContent: "center", position: 'absolute', right: '-7px', top: '-7px'}}>{itemInCart}</div>
                 <button className="cart-btn" onClick={handleCartIconClick}>
                   <FaShoppingCart
                     style={{ fontSize: "48px", color: "#24245a" }}
