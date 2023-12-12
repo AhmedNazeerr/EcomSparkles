@@ -13,7 +13,6 @@ import imgP4 from './wax3.webp';
 import imgP5 from './wax4.webp';
 import imgP6 from './wax5.webp';
 import imgP7 from './wax6.webp';
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ReviewsPP from "./ReviewsPP";
 import PageSections from "./PageSections";
@@ -67,7 +66,7 @@ const dummyProduct = {
 const ProductPage = () => {
 
   const navigate = useNavigate();
-  const { productName } = useParams();
+  const { productName, id } = useParams();
 
   // const [isLoading, setIsLoading] = useState(true);
 
@@ -128,11 +127,10 @@ const ProductPage = () => {
       <div className="product-display">
       <h2>Home /  {productName} </h2>
       </div>
-      <ViewItem productData={productData} />
+      <ViewItem productData={productData} id={id} />
       <div className="Section-Container">
         <PageSections content = {dummyProduct}/>
       </div>
-
       <div className="FBW">
         <div className="FBW-headingWrapper">
             <h1 className="FBW-heading">

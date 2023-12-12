@@ -9,13 +9,13 @@ const ProductCard = (props) => {
     const handleProductItemClick = (Pname) => {
         console.log(`Clicked on ${Pname}`);
         setFadeIn(true); // Set fade-in to true when clicked
-        navigate(`/Products/${Pname}`);
+        navigate(`/Products/${Pname.discription}/${Pname.id}`);
     };
 
     const ratings = Array(parseInt(props.stars)).fill('★');
 
     return (
-        <div onClick={() => handleProductItemClick(props.discription)} className={`prod-Card ${fadeIn ? "fade-in" : ""}`}
+        <div onClick={() => handleProductItemClick(props)} className={`prod-Card ${fadeIn ? "fade-in" : ""}`}
         style={{ animationDelay: `${props.index * 0.3}s` }}>
             <div className='img-container'>
                 <div className={`banner ${props.status}`}></div>

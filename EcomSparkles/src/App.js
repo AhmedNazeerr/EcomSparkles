@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Home from "./Components/Home";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CategoryPage from "./Components/CategoryPage";
@@ -10,7 +10,7 @@ import CheckoutPage from "./Components/CheckoutPage";
 import Cart from "./Components/Cart";
 import img1 from "./Components/CartDummyImg.jpg";
 import Login from "./Components/Login";
-import SignUp from "./Components/SignUp";
+import SignUp from './Components/SignUp'
 import ScrollToTop from "./Components/ScrollToTop";
 import PrivacyPolicy from "./PrivacyPolicy";
 import WhatsappBtn from "./Components/WhatsappBtn";
@@ -19,8 +19,12 @@ import CreateWholesale from './Components/CreateWholesale';
 import SDS from './Components/SDS';
 import AccountPage  from './Components/Account'
 import Address from "./Components/Address";
+import {useDispatch} from 'react-redux';
+import {storeActions} from './Features/slice';
+import axios from "axios";
 // export default App;
 function App() {
+  const dispatch = useDispatch();
   // const [isLoading, setIsLoading] = useState(true);
 
   // useEffect(() => {
@@ -93,7 +97,22 @@ function App() {
     price: {sale: 9.99, old: 13.99},
     image: img1,
   };
-
+  const getCartData = async () => {
+    const response = await axios.get('http://localhost:5000/api/v1/cart/get-cart-items',{
+      withCredentials: true
+    })
+    if(response.status === 200) {
+      dispatch(
+        storeActions.addItemToCart(response.data.cartItems)
+      );
+    }
+  }
+  useEffect(()=>{
+    if(localStorage.getItem('token')) {
+      dispatch(storeActions.setUser(JSON.parse(localStorage.getItem('token'))))
+      getCartData()
+    }
+  }, [])
   return (
     <Router>
       <div className="App">
@@ -106,10 +125,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
-            path="/category/:categoryName"
+            path="/category/:categoryName/:id"
             element={<CategoryPage categoryData={categoryData} />}
           />
-          <Route path="/products/:productName" element={<ProductPage />} />
+          <Route path="/products/:productName/:id" element={<ProductPage />} />
           <Route
             path="/CartPage"
             element={<Cart products={[dummyProduct, dummyProduct2]} />}

@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import { Modal, Button } from "react-bootstrap";
 import Navbar from "./Navbar";
 import Footer from "./Footer"; // Import your Footer component
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { storeActions } from "../Features/slice";
 const LoginPage = () => {
-
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showCreateAccount, setShowCreateAccount] = useState(false);
@@ -14,10 +18,23 @@ const LoginPage = () => {
   
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Add your login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    if(email && password) {
+      const response = await axios.post('http://localhost:5000/api/v1/auth/login', {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        })
+      if(response) {
+        console.log(response)
+        localStorage.setItem('token', JSON.stringify(response.data.user))
+        dispatch(storeActions.setUser(response.data.user))
+        navigate('/')
+      }
+    }
   };
 
   const handleCreateAccountClick = () => {
@@ -30,10 +47,14 @@ const LoginPage = () => {
   };
 
   const handleCloseCreateAccount = () => setShowCreateAccount(false);
-  const handleShowCreateAccount = () => setShowCreateAccount(true);
-  const handleCloseForgotPassword = () => setShowForgotPassword(false);
+  // const handleShowCreateAccount = () => setShowCreateAccount(true);
+  // const handleCloseForgotPassword = () => setShowForgotPassword(false);
   const handleShowForgotPassword = () => setShowForgotPassword(true);
-
+  useEffect(() => {
+    if(Object.keys(user).length) {
+      navigate('/')
+    }
+  },[])
   return (
     <>
       <Navbar />

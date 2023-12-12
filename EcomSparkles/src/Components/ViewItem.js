@@ -7,8 +7,9 @@ import {
 import "./ViewItem.css"; // Import your CSS file for styling
 import { useDispatch } from "react-redux";
 import { storeActions } from "../Features/slice";
+import axios from "axios";
 
-const ViewItem = ({ productData }) => {
+const ViewItem = ({ productData, id }) => {
   const dispatch = useDispatch();
   const [qtyCount, setQtyCount] = useState(1);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
@@ -53,11 +54,22 @@ const ViewItem = ({ productData }) => {
     }
   };
 
-  const addItemToTheCart = () => {
-    console.log(productData)
-    dispatch(
-      storeActions.addItemToCart({ ...productData, quantity: qtyCount })
-    );
+  const addItemToTheCart = async () => {
+    const response = await axios.post('http://localhost:5000/api/v1/cart/add-to-cart', {
+      productId: id,
+      count: qtyCount
+    },
+    {
+      withCredentials: true,
+    })
+    if(response.status === 200) {
+      console.log(response)
+      dispatch(
+        storeActions.addItemToCart({ ...productData, quantity: qtyCount })
+      );
+    } else {
+      console.log(response.error)
+    }
   };
 
   return (

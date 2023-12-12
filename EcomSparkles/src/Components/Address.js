@@ -9,7 +9,6 @@ export default function Address() {
       <Navbar />
       <div
         style={{
-          fontFamily: "Bebas Neue",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -23,6 +22,7 @@ export default function Address() {
               textAlign: "center",
               fontSize: "1.7rem",
               fontWeight: "bold",
+              fontFamily: "Bebas Neue",
             }}
           >
             Addresses

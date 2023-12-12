@@ -15,7 +15,7 @@ const SubCat = ({ images, categories }) => {
         ))}
       </div>
       <div className="column">
-        {categories.map((category, index) => (
+        {categories && categories.map((category, index) => (
           <div
             key={`category-${index}`}
             className="clickable-category"

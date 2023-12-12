@@ -7,7 +7,7 @@ import OrderSummary from "./OrderSummary";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { faLock } from "@fortawesome/free-solid-svg-icons";
+// import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -18,15 +18,6 @@ const dummyProduct = {
   price: 19.99,
   image: "https://via.placeholder.com/40x40", // Dummy image URL
 };
-
-// const shippingMethods = [
-//   {
-//     id: "standard",
-//     label: "Standard Flat Rate (est. 2-3 days)",
-//     cost: "$4.99",
-//   },
-//   // Add more shipping methods to this array if needed
-// ];
 
 const CheckoutPage = () => {
   const isSmallScreen = () => window.innerWidth < 950;

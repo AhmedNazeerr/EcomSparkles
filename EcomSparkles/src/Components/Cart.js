@@ -14,6 +14,7 @@ import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { storeActions } from "../Features/slice";
+import axios from "axios";
 
 const dummyproducts = [
   {
@@ -75,7 +76,7 @@ const Cart = ({products}) => {
     navigate(`/CheckoutPage`);
   };
 
-  const [itemss, setItemss] = useState(cartdata);
+  const [itemss, setItemss] = useState([]);
 
   const isSmallScreen = () => window.innerWidth < 950;
   const [smallScreen, setSmallScreen] = useState(isSmallScreen());
@@ -114,41 +115,48 @@ const Cart = ({products}) => {
     console.log("Prev clicked");
   };
 
-  const handleIncrement = (_value, index) => {
-    const updatedQuantityArray = [...quantityArray];
-    updatedQuantityArray[index] = updatedQuantityArray[index] + 1;
-    setQuantityArray(updatedQuantityArray);
+  const handleIncrement = async (index) => {
+    console.log('i am hit.')
+    const response = await axios.patch(`http://localhost:5000/api/v1/cart/inccart/2`, {
+      withCredentials: true
+    })
+    if(response.status === 200) {
+      console.log(response)
+    }
+    // const updatedQuantityArray = [...quantityArray];
+    // updatedQuantityArray[index] = updatedQuantityArray[index] + 1;
+    // setQuantityArray(updatedQuantityArray);
 
-    // Use updatedQuantityArray for all price calculations
-    const productPriceBefore = cartdata[index].price.old;
-    const newBPrice = productPriceBefore * updatedQuantityArray[index];
-    const updatedBPriceArray = [...bPriceArray];
-    updatedBPriceArray[index] = parseFloat(
-      newBPrice.toFixed(
-        productPriceBefore.toString().split(".")[1]?.length || 0
-      )
-    );
-    setBPriceArray(updatedBPriceArray);
+    // // Use updatedQuantityArray for all price calculations
+    // const productPriceBefore = cartdata[index].price.old;
+    // const newBPrice = productPriceBefore * updatedQuantityArray[index];
+    // const updatedBPriceArray = [...bPriceArray];
+    // updatedBPriceArray[index] = parseFloat(
+    //   newBPrice.toFixed(
+    //     productPriceBefore.toString().split(".")[1]?.length || 0
+    //   )
+    // );
+    // setBPriceArray(updatedBPriceArray);
 
-    const productPriceAfter = cartdata[index].price.sale;
-    const newAPrice = productPriceAfter * updatedQuantityArray[index];
-    const updatedAPriceArray = [...aPriceArray];
-    updatedAPriceArray[index] = parseFloat(
-      newAPrice.toFixed(productPriceAfter.toString().split(".")[1]?.length || 0)
-    );
-    setAPriceArray(updatedAPriceArray);
+    // const productPriceAfter = cartdata[index].price.sale;
+    // const newAPrice = productPriceAfter * updatedQuantityArray[index];
+    // const updatedAPriceArray = [...aPriceArray];
+    // updatedAPriceArray[index] = parseFloat(
+    //   newAPrice.toFixed(productPriceAfter.toString().split(".")[1]?.length || 0)
+    // );
+    // setAPriceArray(updatedAPriceArray);
 
-    // Update the total based on updatedQuantityArray
-    const calculatedTotal = updatedAPriceArray
-      .reduce((acc, price) => acc + price, 0)
-      .toFixed(
-        Math.max(
-          ...updatedAPriceArray.map(
-            (value) => value.toString().split(".")[1]?.length || 0
-          )
-        )
-      );
-    setTotal(parseFloat(calculatedTotal));
+    // // Update the total based on updatedQuantityArray
+    // const calculatedTotal = updatedAPriceArray
+    //   .reduce((acc, price) => acc + price, 0)
+    //   .toFixed(
+    //     Math.max(
+    //       ...updatedAPriceArray.map(
+    //         (value) => value.toString().split(".")[1]?.length || 0
+    //       )
+    //     )
+    //   );
+    // setTotal(parseFloat(calculatedTotal));
   };
 
   const handleDecrement = (_value, index) => {
@@ -193,20 +201,34 @@ const Cart = ({products}) => {
   };
 
   // Call the calculateTotal function when the component mounts and when products change
+  const getCartData = async () => {
+    const response = await axios.get('http://localhost:5000/api/v1/cart/get-cart-items',{
+      withCredentials: true
+    })
+    if(response.status === 200) {
+      setItemss(response.data.cartItems)
+      dispatch(
+        storeActions.addItemToCart(response.data.cartItems)
+      );
+    }
+  }
+  useEffect(()=> {
+    getCartData()
+  }, [])
   useEffect(() => {
-    if(cartdata.length) {
-      const initialQuantities = cartdata.map((product) => product.quantity);
+    if(itemss.length) {
+      const initialQuantities = itemss.map((item) => item.count);
     setQuantityArray(initialQuantities);
 
-    const initialBPrices = cartdata.map((product) => product.price.old); // Fix variable name
+    const initialBPrices = itemss.map((item) => item.product.price); // Fix variable name
     setBPriceArray(initialBPrices);
 
-    const initialAPrices = cartdata.map((product) => product.price.sale); // Fix variable name
+    const initialAPrices = itemss.map((item) => item.product.discounted_price); // Fix variable name
     setAPriceArray(initialAPrices);
 
     let calculatedTotal = 0;
-    cartdata.forEach((product) => {
-      const productTotal = product.price.sale * product.quantity;
+    itemss.forEach((item) => {
+      const productTotal = item.product.discounted_price * item.count;
       calculatedTotal += productTotal;
     });
 
@@ -260,7 +282,7 @@ const Cart = ({products}) => {
             <div key={index} className="cartitem">
               <div className="cart-item-img">
                 <img
-                  src={product.images[0]}
+                  src={imgg2}
                   alt={product.name}
                   className="product-image"
                 />
@@ -270,9 +292,9 @@ const Cart = ({products}) => {
                 <div className="productpricequantity">
                   <div className="productprice">
                     <div className="product-price1">
-                      ${product.price.sale} each{" "}
+                      ${product.product.discounted_price} each{" "}
                     </div>
-                    <div className="product-price2">${product.price.old}</div>
+                    <div className="product-price2">${product.product.price}</div>
                   </div>
                   <div className="quantityRecord">
                     <div className="round-button">
@@ -289,7 +311,7 @@ const Cart = ({products}) => {
                       <button
                         className="plusButton"
                         onClick={() =>
-                          handleIncrement(product.price.sale, index)
+                          handleIncrement(product.id)
                         }
                       >
                         {" "}

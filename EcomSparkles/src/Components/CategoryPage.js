@@ -11,6 +11,7 @@ import ProductCard from './ProductCard.js';
 import Reviews from './Reviews.js'
 import Footer from "./Footer.js";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const CategoryPage = ({ categoryData, subcategoryContent }) => {
  
@@ -19,10 +20,12 @@ const CategoryPage = ({ categoryData, subcategoryContent }) => {
     console.log(`Clicked on ${Pname}`);
     navigate(`/Products/${Pname}`);
   };
-  const { categoryName } = useParams();
+  const { categoryName, id } = useParams();
   const subheadings = categoryData[categoryName] || [];
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [productCount, setProductCount] = useState(0);
+  const [product, setProduct] = useState([]);
 
 
   // useEffect(() => {
@@ -43,8 +46,28 @@ const CategoryPage = ({ categoryData, subcategoryContent }) => {
   //   );
   // }
 
-
-
+  const getProduct = async () => {
+    if(categoryName !== 'all products') {
+      const response = await axios.get(`http://localhost:5000/api/v1/products?categoryId=${id}`)
+      if(response.status === 200){
+        const {count, rows} = response.data.products
+        setProductCount(count)
+        setProduct(rows)
+      }
+    } else {
+      const response = await axios.get(`http://localhost:5000/api/v1/products`)
+      if(response.status === 200){
+        const {count, rows} = response.data.products
+        setProductCount(count)
+        setProduct(rows)
+        console.log(rows)
+      }
+    }
+  }
+  useEffect(() => {
+    getProduct()
+  }, [id])
+  
   const productCards = [
     {
       title: "Product 1",
@@ -247,15 +270,16 @@ const CategoryPage = ({ categoryData, subcategoryContent }) => {
           <Bar count="9" />
           <div className="additional-content">
             <div className="d-flexCC">
-              {productCards.slice(startIndex, endIndex).map((product, index) => (
+              {product.length && product.map((product, index) => (
                 <ProductCard
+                  id={product.id}
                   key={index}
-                  discription={product.title} 
-                  price={product.newprice}
-                  stars={product.stars}
-                  NoOfReviews={product.NoOfReviews}
-                  img={product.image}
-                  status={product.status}
+                  discription={product.name} 
+                  price={product.price}
+                  stars={4}
+                  NoOfReviews={50}
+                  img={img1}
+                  status={'bestselling'}
                 />
               ))}
             </div>

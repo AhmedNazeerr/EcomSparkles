@@ -9,14 +9,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes, faChevronRight, faMapMarker } from "@fortawesome/free-solid-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
 import SubCat from "./SubCat";
 import SearchBar from "./SearchBar.js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { storeActions } from "../Features/slice";
 
 
 const Navbar = ({shouldExecute = true}) => {
+  const dispatch = useDispatch()
+  const [categories, setCategories] = useState([])
+  // const [subCategories, setSubCategories] = useState([])
+  const user = useSelector(state => state.user)
   const itemInCart = useSelector(state => state.itemInCart)
   const isSmallScreen = () => window.innerWidth < 950;
 
@@ -65,51 +71,50 @@ const Navbar = ({shouldExecute = true}) => {
     };
   }, []);
 
-  const menuItems = [
-    "All Products",
-    "Exterior Care",
-    "Interior Care",
-    "Accessories",
-    "Lubricants",
-    "Filters",
-    "Wholesaler & Distributor"
-  ];
+  // const menuItems = [
+  //   "All Products",
+  //   "Exterior Care",
+  //   "Interior Care",
+  //   "Accessories",
+  //   "Lubricants",
+  //   "Filters",
+  //   "Wholesaler & Distributor"
+  // ];
 
-  const dropdownContents = {
+//   const dropdownContents = {
+//     "All Products" : <SubCat
+//     images={[img2]}
+//     categories={subCategories}
+//   />,
+//     "Exterior Care" : <SubCat
+//     images={[img1]}
+//     categories={subCategories}
+//   />,
+//     "Interior Care" : <SubCat
+//     images={[img1]}
+//     categories={subCategories}
+//   />,
+//     "Accessories" : <SubCat
+//     images={[img1]}
+//     categories={subCategories}
+//   />,
+//     "Lubricants" : <SubCat
+//     images={[img1]}
+//     categories={subCategories}
+//   />,
+//     "Filters": <SubCat
+//     images={[img1]}
+//     categories={subCategories}
+//   />,
+//   "Wholesaler & Distributor": <SubCat
+//   images={[img1]}
+//   categories={subCategories}
+// />,
+//   };
 
-    "All Products" : <SubCat
-    images={[img2]}
-    categories={['New Releases', 'Bundles', 'Shampoos', 'Accessories', 'Interior Cleaner', 'Microfiber','Accessories', 'Fragrances', 'Cleaning Kits','Bundles','Towels','Clothes','PAD','Mits & Sponges','Bike Engine Oil','Car Engine Oil','Gear Oil','Break Oil','Radiator Coolent','Battery Water','Air Filter','Oil Filter','AC Filter' ]}
-  />,
-    "Exterior Care" : <SubCat
-    images={[img1]}
-    categories={['New Releases', 'Bundles', 'Shampoos', 'Accessories' ]}
-  />,
-    "Interior Care" : <SubCat
-    images={[img1]}
-    categories={['New Releases', 'Interior Cleaner', 'Microfiber','Accessories', 'Fragrances', 'Cleaning Kits']}
-  />,
-    "Accessories" : <SubCat
-    images={[img1]}
-    categories={['Bundles','Towels','Clothes','PAD','Mits & Sponges']}
-  />,
-    "Lubricants" : <SubCat
-    images={[img1]}
-    categories={['Bike Engine Oil','Car Engine Oil','Gear Oil','Break Oil','Radiator Coolent','Battery Water']}
-  />,
-    "Filters": <SubCat
-    images={[img1]}
-    categories={['Air Filter','Oil Filter','AC Filter']}
-  />,
-  "Wholesaler & Distributor": <SubCat
-  images={[img1]}
-  categories={['Air Filter','Car Engine Oil','Gear Oil','Air Filter','Car Engine Oil','Gear Oil']}
-/>,
-  };
-
-  const handleMenuItemClick = (item) => {
+  const handleMenuItemClick = (item, idx) => {
     console.log(`Clicked on ${item}`);
-    navigate(`/category/${item}`);
+    navigate(`/category/${item.trim().toLowerCase()}/${idx+1}`);
   };
 
   const handleCartIconClick = () => {
@@ -121,10 +126,33 @@ const Navbar = ({shouldExecute = true}) => {
     console.log(`Clicked on Login`);
     navigate(`/Login`);
   };
-
-  function getDropdownContent(item) {
-    return dropdownContents[item];
+  const handleProfileIconClick = () => {
+    navigate(`/account`);
+  };
+  const handleLogoutIconClick = async () => {
+    const response = await axios.get('http://localhost:5000/api/v1/auth/logout')
+    if(response.status === 200) {
+      localStorage.removeItem('token')
+      dispatch(storeActions.resetUser())
+      navigate(`/`);
+    }
+  };
+  // function getDropdownContent(item) {
+  //   return dropdownContents[item.name];
+  //     const response = await axios.get(`http://localhost:5000/api/v1/products/subcatg/${item.id}`)
+  //     if(response.status === 200) {
+  //       console.log(response)
+  //     }
+  // }
+  const getCategories = async () => {
+    const response = await axios.get('http://localhost:5000/api/v1/products/catg')
+    if(response.status === 200) {
+      setCategories(response.data.categories)
+    }
   }
+  useEffect(() => {
+    getCategories() 
+  }, [])
 
   return (
     <>
@@ -176,9 +204,9 @@ const Navbar = ({shouldExecute = true}) => {
     </Modal.Header>
     <Modal.Body>
       <ul className="menu-list">
-        {menuItems.map((item, index) => (
+        {categories.map((item, index) => (
           <li key={index}>
-            {item}
+            {item.name}
             <FontAwesomeIcon
               icon={faChevronRight}
               style={{ fontSize: "12px", color: "#24245a", cursor: "pointer" }}
@@ -221,16 +249,16 @@ const Navbar = ({shouldExecute = true}) => {
                 />
             </div>
             <div>
-              <a href="/">
+              <Link to="/">
                 <img src={location} alt="Your location" className="location" />
-              </a>
+              </Link>
               <div className="location-btn-text">FIND A STORE</div>
             </div>
             <div className="navbar-middle">
               <SearchBar />
             </div>
             <div className="navbar-right">
-              <div className="child1">
+              {!Object.keys(user).length ? <div className="child1">
                 <button className="login-btn" onClick={handleLoginIconClick}>
                   <FontAwesomeIcon
                     icon={faUser}
@@ -238,8 +266,16 @@ const Navbar = ({shouldExecute = true}) => {
                   />
                   <div className="login-btn-text">Log in</div>
                 </button>
-              </div>
-
+              </div>: 
+              <div className="child1">
+              <button className="login-btn" onClick={handleProfileIconClick}>
+                <FontAwesomeIcon
+                  icon={faUser}
+                  style={{ fontSize: "48px", color: "#24245a" }}
+                />
+                <div className="login-btn-text">Profile</div>
+              </button>
+            </div>}
               <div className="child2" style={{width: 'fit-content', position: 'relative'}}>
                 <div style={{backgroundColor: 'red', width: '25px', height: '25px', borderRadius: '100%', color:"white", fontWeight: 'bold', display: "flex", alignItems: "center", justifyContent: "center", position: 'absolute', right: '-7px', top: '-7px'}}>{itemInCart}</div>
                 <button className="cart-btn" onClick={handleCartIconClick}>
@@ -249,19 +285,25 @@ const Navbar = ({shouldExecute = true}) => {
                   <div className="cart-btn-text">Cart</div>
                 </button>
               </div>
+              {Object.keys(user).length !== 0 && <div className="child1">
+                <button className="login-btn" onClick={handleLogoutIconClick}>
+                  <i className="fa-solid fa-right-from-bracket" style={{ fontSize: "48px", color: "#24245a" }}></i>
+                  <div className="login-btn-text">Logout</div>
+                </button>
+              </div>}
             </div>
           </nav>
           <div id="navmenu" className="navbar-menu">
-            {menuItems.map((item) => (
+            {categories && categories.map((item, idx) => (
               <div
-                key={item}
+                key={idx}
                 className="menu-item"
-                onClick={() => handleMenuItemClick(item)}
+                onClick={() => handleMenuItemClick(item.name, idx)}
               >
-                {item}
-                <div className="dropdown-menu">
+                {item.name}
+                {/* <div className="dropdown-menu">
                 {getDropdownContent(item)}
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

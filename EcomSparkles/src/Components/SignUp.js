@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import Navbar from "./Navbar";
 import Footer from "./Footer"; // Import your Footer component
 import {useNavigate} from "react-router-dom";
+import axios from 'axios';
 
 const LoginPage = () => {
   const [firstname, setFirstname] = useState('');
@@ -13,10 +14,18 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
 
-  const handleSignUp = () => {
-    // Add your login logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
+  const handleSignUp = async () => {
+    if(firstname && lastname && email && password) {
+      const response = await axios.post('http://localhost:5000/api/v1/auth/register', {
+        email: email,
+        password: password,
+        name: firstname + ' ' + lastname
+      })
+      if (response){
+        console.log(response)
+        navigate(`/`);
+      }
+    }
   };
 
   const handleLogin= () => {
