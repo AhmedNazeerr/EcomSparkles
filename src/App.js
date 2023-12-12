@@ -18,6 +18,7 @@ import BlogPost from './Components/BlogPost';
 import CreateWholesale from './Components/CreateWholesale';
 import SDS from './Components/SDS';
 import AccountPage  from './Components/Account'
+import Address from "./Components/Address";
 // export default App;
 function App() {
   // const [isLoading, setIsLoading] = useState(true);
@@ -121,6 +122,7 @@ function App() {
           <Route path="/SDS" element={<SDS />} /> 
           <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
           <Route path="/account" element={<AccountPage  />} />
+          <Route path="/account/address" element={<Address  />} />
         </Routes>
         <WhatsappBtn />
       </div>
