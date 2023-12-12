@@ -7,6 +7,9 @@ const { Op } = require('sequelize');
 
 const createCategory = async (req, res) => {
       const { name } = req.body;
+      if(!name){
+        throw new CustomError.BadRequestError("Kinldy provide a category name inorder to create a category")
+      }
       const category = await Category.create({ name });
       if(category){
       res.status(StatusCodes.CREATED).json({ category });
@@ -20,6 +23,9 @@ const createCategory = async (req, res) => {
   const updateCategory = async (req, res) => {
       const { categoryId } = req.params;
       const { name } = req.body;  
+      if(!name || !categoryId){
+        throw new CustomError.BadRequestError("kindly provide valid values, inorder to update a category");
+      }
       const category = await Category.findByPk(categoryId);
       if (!category) {
         throw new CustomError.BadRequestError(`Cateogry not found`);
@@ -31,6 +37,9 @@ const createCategory = async (req, res) => {
   
   const deleteCategory = async (req, res) => {
       const { categoryId } = req.params;
+      if(!categoryId){
+        throw new CustomError.BadRequestError("Kindly provide categoryID inorder to delete a catg")
+      }
       const category = await Category.findByPk(categoryId);
       if (!category) {
         throw new CustomError.BadRequestError(`Cateogry not found`);
@@ -58,6 +67,9 @@ const createCategory = async (req, res) => {
   const createSubCategory = async (req, res) => {
     const {categoryId}=req.params
     const { name} = req.body;
+    if(!categoryId || !name){
+      throw new CustomError.BadRequestError("Kindly provide valid values to create a sub catg")
+    }
       // Check if the specified category exists
       const category = await Category.findByPk(categoryId);
       if (!category) {
@@ -73,6 +85,9 @@ const createCategory = async (req, res) => {
   const updateSubCategory = async (req, res) => {
       const { subCategoryId } = req.params;
       const { name } = req.body;
+      if(!subCategoryId || !name){
+        throw new CustomError.BadRequestError("Kindly provide valid values inorder to update a sub catg")
+      }
       const subCategory = await SubCategory.findByPk(subCategoryId);
       if (!subCategory) {
         throw new CustomError.BadRequestError('SubCategory not found');
@@ -84,7 +99,9 @@ const createCategory = async (req, res) => {
   
   const deleteSubCategory = async (req, res) => {
       const { subCategoryId } = req.params;
-  
+  if(!subCategoryId){
+    throw new CustomError.BadRequestError("Kinldy provide a subCategoryId inorder to delete a sub catg")
+  }
       const subCategory = await SubCategory.findByPk(subCategoryId);
       if (!subCategory) {
         throw new CustomError.BadRequestError('SubCategory not found');
@@ -95,6 +112,9 @@ const createCategory = async (req, res) => {
 
   const getAllSubCategories = async (req, res) => {
     const { categoryId } = req.params;
+    if(!categoryId){
+      throw new CustomError.BadRequestError("Kindly provide a category id to get all the sub catg of that catg")
+    }
     const subCategories = await SubCategory.findAll({
         where: { categoryId },
     });
@@ -111,7 +131,9 @@ const createProduct = async (req, res) => {
     console.log(req.body); // Log the request body to the console
 
     const { name, price, discounted_price, images, features, how_to_apply, categoryId, subCategoryId,stock } = req.body;
-
+    if(!name || !price || !discounted_price || !images || !features || !how_to_apply || !categoryId ||!subCategoryId ||!stock){
+      throw new CustomError.BadRequestError("Kindly provide valid values inorder to create a product")
+    }
     console.log('categoryId:', categoryId);
     console.log('subCategoryId:', subCategoryId);
 
@@ -149,7 +171,9 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     const { productId } = req.params;
     const { name, price, discounted_price, images, features, how_to_apply,categoryId,  subCategoryId,stock } = req.body;
-
+if(!productId || !name || !discounted_price || !images || !features || !how_to_apply || !categoryId || !subCategoryId || !stock){
+  throw new CustomError.BadRequestError("Kindly provide valid values, inorder to update a product")
+}
     const product = await Product.findByPk(productId);
     if (!product) {
         throw new CustomError.BadRequestError('Product not found');
@@ -172,7 +196,9 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     const { productId } = req.params;
-
+if(!productId){
+  throw new CustomError.BadRequestError("Kindly provide productID, inorder to delete a product")
+}
     const product = await Product.findByPk(productId);
     if (!product) {
         throw new CustomError.BadRequestError('Product not found');

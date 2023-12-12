@@ -6,8 +6,8 @@ const {
   } = require('../middleware/authentication');
 
 const {createOrder,getAllOrdersByUserId,getUserOrdersById,deleteOrder} = require('../controllers/OrderController.js');
-router.post('/',authenticateUser, authorizePermissions('admin'), createOrder);
-router.get('/',authenticateUser, authorizePermissions('admin'), getAllOrdersByUserId);
+router.post('/',authenticateUser, authorizePermissions('user'), createOrder);
+router.get('/',authenticateUser, authorizePermissions('user'), getAllOrdersByUserId);
 router.get('/:userId',authenticateUser, authorizePermissions('admin'), getUserOrdersById);
 router.delete('/:orderId',authenticateUser, authorizePermissions('admin'),deleteOrder);
 

@@ -1,13 +1,19 @@
 const { StatusCodes } = require('http-status-codes');
 const { Cart, CartItem, Product, User,sequelize } = require('../models/Main'); // Update the path as needed
 const {CustomAPIError,BadRequestError} = require('../errors/index');
+const { CountryCodes } = require('validator/lib/isISO31661Alpha2');
 
 // Function to add an item to the user's cart
 const addToCart = async (req, res) => {
     try {
         const { productId, count } = req.body;
         const { userId } = req.user;
-
+        if(!productId || !count ){
+            throw new BadRequestError('Cart cannot get active by invalid values')
+        }
+        if(!userId){
+            throw new BadRequestError('Session has been expired,Login in again')
+        }
         // Check if the product exists
         const product = await Product.findByPk(productId);
         if (!product) {
@@ -84,7 +90,9 @@ const inccartitem = async (req, res) => {
     try {
         const { id } = req.params;
         const { userId } = req.user;
-
+        if (!userId) {
+            throw new CustomAPIError('Session has been expired login in Again');
+        }
         if (!id) {
             throw new CustomAPIError('Invalid cartItem data');
         }
@@ -138,7 +146,9 @@ const deccartitem = async (req, res) => {
     try {
         const { id } = req.params;
         const { userId } = req.user;
-
+        if (!userId) {
+            throw new CustomAPIError('Session has been expired login in Again');
+        }
         if (!id) {
             throw new CustomAPIError('Invalid cartItem data');
         }
@@ -198,7 +208,9 @@ const deccartitem = async (req, res) => {
 
 const getCartItems = async (req, res) => {
     const { userId } = req.user; // Assuming you have a middleware to extract the user from the request
-
+    if (!userId) {
+        throw new CustomAPIError('Session has been expired login in Again');
+    }
     // Check if the user has a cart
     const userCart = await Cart.findOne({
         where: { userId },

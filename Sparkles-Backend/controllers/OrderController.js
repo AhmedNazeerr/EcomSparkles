@@ -5,7 +5,12 @@ const createOrder = async (req, res) => {
     try {
         const { userId } = req.user;
         const { email, phoneNumber, firstName, lastName, address, city, province, zipCode } = req.body;
-
+   if(!email || !phoneNumber || !firstName || !lastName || !address || !city || !province || !zipCode){
+    throw new CustomAPIError('Please fil all the details to initiate a checkout')
+   }
+   if(!userId){
+    throw new CustomAPIError("Session has been expired, Login in again")
+   }
         // Check if the user has a cart
         const userCart = await Cart.findOne({
             where: { userId },
@@ -77,7 +82,9 @@ const createOrder = async (req, res) => {
 const getAllOrdersByUserId = async (req, res) => {
     try {
         const { userId } = req.user;
-
+if(!userId){
+    throw new BadRequestError('Session has been expired,Login in again')
+}
         // Fetch all orders for the user
         const userOrders = await Order.findAll({
             where: { userId },
@@ -98,7 +105,9 @@ const getAllOrdersByUserId = async (req, res) => {
 const getUserOrdersById = async (req, res) => {
     try {
         const { userId } = req.params;
-
+if(!userId){
+    throw new CustomAPIError('Cannot get orders with invalid userId')
+}
         // Fetch all orders for the specified user ID
         const userOrders = await Order.findAll({
             where: { userId },
@@ -119,7 +128,9 @@ const getUserOrdersById = async (req, res) => {
 const deleteOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
-
+if(!orderId){
+    throw new CustomAPIError('Kindly provide orderID in order to delete an order')
+}
         // Fetch the order with associated order items
         const order = await Order.findByPk(orderId, {
             include: [{ model: OrderItem, include: [{ model: Product }] }],
